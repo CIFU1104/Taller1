@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ExplorarDestinosBinding
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.google.gson.Gson
 import model.Destino
 import org.json.JSONObject
 import java.io.IOException
@@ -25,6 +26,7 @@ class ExplorarDestinos : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val filtro = intent.getStringExtra("Filtro")
+        stringToObject()
         initRecyclerView()
     }
     private fun loadJSONFromAsset(context: Context): String? {
@@ -47,15 +49,17 @@ class ExplorarDestinos : ComponentActivity() {
         val destinosJson = json.getJSONArray("destinos")
         for (i in 0 until destinosJson.length()){
             val jsonObject = destinosJson.getJSONObject(i)
-            //arreglo.add(()jsonObject.getString("destinos"))
+            val jsonStringFromObject = jsonObject.toString()
+            val destino: Destino = Gson().fromJson(jsonStringFromObject, Destino::class.java)
+            arreglo.add(destino)
         }
 
     }
     private fun initRecyclerView(){
+        DestinoProvider.mutableEmptyList.addAll(arreglo)
         val recyclerView = bindig.recyclerDestinos
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = DestinoAdapter(DestinoProvider.mutableEmptyList)
-
     }
 
 }
