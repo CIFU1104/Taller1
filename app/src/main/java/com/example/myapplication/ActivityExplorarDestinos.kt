@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
@@ -18,14 +19,16 @@ import java.io.IOException
 import java.io.InputStream
 
 class ExplorarDestinos : ComponentActivity() {
-    private lateinit var bindig: ExplorarDestinosBinding
-    private val arreglo:ArrayList<Destino> = ArrayList<Destino>()
+    private lateinit var binding: ExplorarDestinosBinding
+    private var arreglo:ArrayList<Destino> = ArrayList<Destino>()
+    private lateinit var destinoAdapter: DestinoAdapter
+    private var filtro:String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
-        bindig = ExplorarDestinosBinding.inflate(layoutInflater)
-        setContentView(bindig.root)
+        binding = ExplorarDestinosBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val filtro = intent.getStringExtra("Filtro")
+        filtro = intent.getStringExtra("Filtro")!!
         stringToObject()
         initRecyclerView()
     }
@@ -51,16 +54,24 @@ class ExplorarDestinos : ComponentActivity() {
             val jsonObject = destinosJson.getJSONObject(i)
             val jsonStringFromObject = jsonObject.toString()
             val destino: Destino = Gson().fromJson(jsonStringFromObject, Destino::class.java)
-            arreglo.add(destino)
+            if(destino.categoria.equals(filtro) || filtro.equals("Todos")){
+                arreglo.add(destino)
+            }
         }
-
     }
     private fun initRecyclerView(){
-        DestinoProvider.mutableEmptyList.addAll(arreglo)
-        val recyclerView = bindig.recyclerDestinos
+        val recyclerView = binding.recyclerDestinos
+        recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = DestinoAdapter(DestinoProvider.mutableEmptyList)
+        destinoAdapter = DestinoAdapter(arreglo)
+        recyclerView.adapter = destinoAdapter
+        destinoAdapter.onItemClick = {
+            val intent = Intent(this, ActivityDetailed::class.java)
+            intent.putExtra("destino", it)
+            startActivity(intent)
+        }
     }
+
 
 }
 

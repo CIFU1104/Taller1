@@ -13,6 +13,12 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
+            android:name=".ui.theme.ActivityFavoritos"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityDetailed"
+            android:exported="false" />
+        <activity
             android:name=".ExplorarDestinos"
             android:exported="true"
             android:label="@string/title_activity_explorar_destinos"
